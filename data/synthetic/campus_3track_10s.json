@@ -1,0 +1,47 @@
+{
+  "scenario": "campus_3track_10s",
+  "description": "1 Hz synthetic WGS84 tracks near campus. Three vehicles, 11 samples. No UAV identity. Ready for ingest → publish; geocode not required.",
+  "origin": {
+    "lat": 37.2284,
+    "lng": -80.4234,
+    "alt_m": 630.0
+  },
+  "rate_hz": 1,
+  "points": [
+    {"time": "2026-09-29T18:00:00Z", "track_id": "t1", "lat": 37.228400, "lng": -80.423400, "alt": 120.0, "speed_mps": 8.0, "heading_deg": 0.0, "uncertainty_m": 25.0, "source": "synthetic"},
+    {"time": "2026-09-29T18:00:01Z", "track_id": "t1", "lat": 37.228472, "lng": -80.423400, "alt": 120.0, "speed_mps": 8.0, "heading_deg": 0.0, "uncertainty_m": 25.0, "source": "synthetic"},
+    {"time": "2026-09-29T18:00:02Z", "track_id": "t1", "lat": 37.228544, "lng": -80.423400, "alt": 120.0, "speed_mps": 8.0, "heading_deg": 0.0, "uncertainty_m": 25.0, "source": "synthetic"},
+    {"time": "2026-09-29T18:00:03Z", "track_id": "t1", "lat": 37.228616, "lng": -80.423400, "alt": 120.0, "speed_mps": 8.0, "heading_deg": 0.0, "uncertainty_m": 25.0, "source": "synthetic"},
+    {"time": "2026-09-29T18:00:04Z", "track_id": "t1", "lat": 37.228687, "lng": -80.423400, "alt": 120.0, "speed_mps": 8.0, "heading_deg": 0.0, "uncertainty_m": 25.0, "source": "synthetic"},
+    {"time": "2026-09-29T18:00:05Z", "track_id": "t1", "lat": 37.228759, "lng": -80.423400, "alt": 120.0, "speed_mps": 8.0, "heading_deg": 0.0, "uncertainty_m": 25.0, "source": "synthetic"},
+    {"time": "2026-09-29T18:00:06Z", "track_id": "t1", "lat": 37.228831, "lng": -80.423400, "alt": 120.0, "speed_mps": 8.0, "heading_deg": 0.0, "uncertainty_m": 25.0, "source": "synthetic"},
+    {"time": "2026-09-29T18:00:07Z", "track_id": "t1", "lat": 37.228903, "lng": -80.423400, "alt": 120.0, "speed_mps": 8.0, "heading_deg": 0.0, "uncertainty_m": 25.0, "source": "synthetic"},
+    {"time": "2026-09-29T18:00:08Z", "track_id": "t1", "lat": 37.228975, "lng": -80.423400, "alt": 120.0, "speed_mps": 8.0, "heading_deg": 0.0, "uncertainty_m": 25.0, "source": "synthetic"},
+    {"time": "2026-09-29T18:00:09Z", "track_id": "t1", "lat": 37.229047, "lng": -80.423400, "alt": 120.0, "speed_mps": 8.0, "heading_deg": 0.0, "uncertainty_m": 25.0, "source": "synthetic"},
+    {"time": "2026-09-29T18:00:10Z", "track_id": "t1", "lat": 37.229119, "lng": -80.423400, "alt": 120.0, "speed_mps": 8.0, "heading_deg": 0.0, "uncertainty_m": 25.0, "source": "synthetic"},
+
+    {"time": "2026-09-29T18:00:00Z", "track_id": "t2", "lat": 37.228400, "lng": -80.422949, "alt": 95.0, "speed_mps": 6.0, "heading_deg": 90.0, "uncertainty_m": 30.0, "source": "synthetic"},
+    {"time": "2026-09-29T18:00:01Z", "track_id": "t2", "lat": 37.228400, "lng": -80.422881, "alt": 95.0, "speed_mps": 6.0, "heading_deg": 90.0, "uncertainty_m": 30.0, "source": "synthetic"},
+    {"time": "2026-09-29T18:00:02Z", "track_id": "t2", "lat": 37.228400, "lng": -80.422814, "alt": 95.0, "speed_mps": 6.0, "heading_deg": 90.0, "uncertainty_m": 30.0, "source": "synthetic"},
+    {"time": "2026-09-29T18:00:03Z", "track_id": "t2", "lat": 37.228400, "lng": -80.422746, "alt": 95.0, "speed_mps": 6.0, "heading_deg": 90.0, "uncertainty_m": 30.0, "source": "synthetic"},
+    {"time": "2026-09-29T18:00:04Z", "track_id": "t2", "lat": 37.228400, "lng": -80.422678, "alt": 95.0, "speed_mps": 6.0, "heading_deg": 90.0, "uncertainty_m": 30.0, "source": "synthetic"},
+    {"time": "2026-09-29T18:00:05Z", "track_id": "t2", "lat": 37.228400, "lng": -80.422611, "alt": 95.0, "speed_mps": 6.0, "heading_deg": 90.0, "uncertainty_m": 30.0, "source": "synthetic"},
+    {"time": "2026-09-29T18:00:06Z", "track_id": "t2", "lat": 37.228400, "lng": -80.422543, "alt": 95.0, "speed_mps": 6.0, "heading_deg": 90.0, "uncertainty_m": 30.0, "source": "synthetic"},
+    {"time": "2026-09-29T18:00:07Z", "track_id": "t2", "lat": 37.228400, "lng": -80.422475, "alt": 95.0, "speed_mps": 6.0, "heading_deg": 90.0, "uncertainty_m": 30.0, "source": "synthetic"},
+    {"time": "2026-09-29T18:00:08Z", "track_id": "t2", "lat": 37.228400, "lng": -80.422408, "alt": 95.0, "speed_mps": 6.0, "heading_deg": 90.0, "uncertainty_m": 30.0, "source": "synthetic"},
+    {"time": "2026-09-29T18:00:09Z", "track_id": "t2", "lat": 37.228400, "lng": -80.422340, "alt": 95.0, "speed_mps": 6.0, "heading_deg": 90.0, "uncertainty_m": 30.0, "source": "synthetic"},
+    {"time": "2026-09-29T18:00:10Z", "track_id": "t2", "lat": 37.228400, "lng": -80.422272, "alt": 95.0, "speed_mps": 6.0, "heading_deg": 90.0, "uncertainty_m": 30.0, "source": "synthetic"},
+
+    {"time": "2026-09-29T18:00:00Z", "track_id": "t3", "lat": 37.228669, "lng": -80.423626, "alt": 140.0, "speed_mps": 3.0, "heading_deg": 180.0, "uncertainty_m": 20.0, "source": "synthetic"},
+    {"time": "2026-09-29T18:00:01Z", "track_id": "t3", "lat": 37.228642, "lng": -80.423626, "alt": 140.0, "speed_mps": 3.0, "heading_deg": 180.0, "uncertainty_m": 20.0, "source": "synthetic"},
+    {"time": "2026-09-29T18:00:02Z", "track_id": "t3", "lat": 37.228615, "lng": -80.423626, "alt": 140.0, "speed_mps": 3.0, "heading_deg": 180.0, "uncertainty_m": 20.0, "source": "synthetic"},
+    {"time": "2026-09-29T18:00:03Z", "track_id": "t3", "lat": 37.228589, "lng": -80.423626, "alt": 140.0, "speed_mps": 3.0, "heading_deg": 180.0, "uncertainty_m": 20.0, "source": "synthetic"},
+    {"time": "2026-09-29T18:00:04Z", "track_id": "t3", "lat": 37.228562, "lng": -80.423626, "alt": 140.0, "speed_mps": 3.0, "heading_deg": 180.0, "uncertainty_m": 20.0, "source": "synthetic"},
+    {"time": "2026-09-29T18:00:05Z", "track_id": "t3", "lat": 37.228535, "lng": -80.423626, "alt": 140.0, "speed_mps": 3.0, "heading_deg": 180.0, "uncertainty_m": 20.0, "source": "synthetic"},
+    {"time": "2026-09-29T18:00:06Z", "track_id": "t3", "lat": 37.228508, "lng": -80.423626, "alt": 140.0, "speed_mps": 3.0, "heading_deg": 180.0, "uncertainty_m": 20.0, "source": "synthetic"},
+    {"time": "2026-09-29T18:00:07Z", "track_id": "t3", "lat": 37.228481, "lng": -80.423626, "alt": 140.0, "speed_mps": 3.0, "heading_deg": 180.0, "uncertainty_m": 20.0, "source": "synthetic"},
+    {"time": "2026-09-29T18:00:08Z", "track_id": "t3", "lat": 37.228454, "lng": -80.423626, "alt": 140.0, "speed_mps": 3.0, "heading_deg": 180.0, "uncertainty_m": 20.0, "source": "synthetic"},
+    {"time": "2026-09-29T18:00:09Z", "track_id": "t3", "lat": 37.228427, "lng": -80.423626, "alt": 140.0, "speed_mps": 3.0, "heading_deg": 180.0, "uncertainty_m": 20.0, "source": "synthetic"},
+    {"time": "2026-09-29T18:00:10Z", "track_id": "t3", "lat": 37.228400, "lng": -80.423626, "alt": 140.0, "speed_mps": 3.0, "heading_deg": 180.0, "uncertainty_m": 20.0, "source": "synthetic"}
+  ]
+}

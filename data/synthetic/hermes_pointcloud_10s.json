@@ -1,0 +1,101 @@
+{
+  "description": "Synthetic stand-in for HermesPy radar.reception.cloud: local metres, not lat/lng. Time and sensor_id are added on dump; HermesPy points themselves are only position, velocity, power.",
+  "frame": "radar_local",
+  "units": {"position": "m", "velocity": "m/s"},
+  "sensor": {
+    "id": "bs1",
+    "position_m": [0.0, 0.0, 25.0]
+  },
+  "axes": "x=east, y=north, z=up, origin at scene origin (not the antenna)",
+  "frames": [
+    {
+      "time": "2026-09-29T18:00:00Z",
+      "detections": [
+        {"position_m": [0.0, 0.0, 120.0], "velocity_mps": [0.0, 8.0, 0.0], "power": 0.80},
+        {"position_m": [40.0, 0.0, 95.0], "velocity_mps": [6.0, 0.0, 0.0], "power": 0.55},
+        {"position_m": [-20.0, 30.0, 140.0], "velocity_mps": [0.0, -3.0, 0.0], "power": 0.62}
+      ]
+    },
+    {
+      "time": "2026-09-29T18:00:01Z",
+      "detections": [
+        {"position_m": [0.0, 8.0, 120.0], "velocity_mps": [0.0, 8.0, 0.0], "power": 0.79},
+        {"position_m": [46.0, 0.0, 95.0], "velocity_mps": [6.0, 0.0, 0.0], "power": 0.54},
+        {"position_m": [-20.0, 27.0, 140.0], "velocity_mps": [0.0, -3.0, 0.0], "power": 0.61}
+      ]
+    },
+    {
+      "time": "2026-09-29T18:00:02Z",
+      "detections": [
+        {"position_m": [0.0, 16.0, 120.0], "velocity_mps": [0.0, 8.0, 0.0], "power": 0.81},
+        {"position_m": [52.0, 0.0, 95.0], "velocity_mps": [6.0, 0.0, 0.0], "power": 0.52},
+        {"position_m": [-20.0, 24.0, 140.0], "velocity_mps": [0.0, -3.0, 0.0], "power": 0.63},
+        {"position_m": [12.0, -4.0, 8.0], "velocity_mps": [0.1, 0.0, 0.0], "power": 0.11}
+      ]
+    },
+    {
+      "time": "2026-09-29T18:00:03Z",
+      "detections": [
+        {"position_m": [0.0, 24.0, 120.0], "velocity_mps": [0.0, 8.0, 0.0], "power": 0.78},
+        {"position_m": [58.0, 0.0, 95.0], "velocity_mps": [6.0, 0.0, 0.0], "power": 0.53},
+        {"position_m": [-20.0, 21.0, 140.0], "velocity_mps": [0.0, -3.0, 0.0], "power": 0.60}
+      ]
+    },
+    {
+      "time": "2026-09-29T18:00:04Z",
+      "detections": [
+        {"position_m": [0.0, 32.0, 120.0], "velocity_mps": [0.0, 8.0, 0.0], "power": 0.80},
+        {"position_m": [64.0, 0.0, 95.0], "velocity_mps": [6.0, 0.0, 0.0], "power": 0.51},
+        {"position_m": [-20.0, 18.0, 140.0], "velocity_mps": [0.0, -3.0, 0.0], "power": 0.62}
+      ]
+    },
+    {
+      "time": "2026-09-29T18:00:05Z",
+      "detections": [
+        {"position_m": [0.0, 40.0, 120.0], "velocity_mps": [0.0, 8.0, 0.0], "power": 0.77},
+        {"position_m": [70.0, 0.0, 95.0], "velocity_mps": [6.0, 0.0, 0.0], "power": 0.50},
+        {"position_m": [-20.0, 15.0, 140.0], "velocity_mps": [0.0, -3.0, 0.0], "power": 0.59}
+      ]
+    },
+    {
+      "time": "2026-09-29T18:00:06Z",
+      "detections": [
+        {"position_m": [0.0, 48.0, 120.0], "velocity_mps": [0.0, 8.0, 0.0], "power": 0.76},
+        {"position_m": [76.0, 0.0, 95.0], "velocity_mps": [6.0, 0.0, 0.0], "power": 0.49},
+        {"position_m": [-20.0, 12.0, 140.0], "velocity_mps": [0.0, -3.0, 0.0], "power": 0.61}
+      ]
+    },
+    {
+      "time": "2026-09-29T18:00:07Z",
+      "detections": [
+        {"position_m": [0.0, 56.0, 120.0], "velocity_mps": [0.0, 8.0, 0.0], "power": 0.75},
+        {"position_m": [82.0, 0.0, 95.0], "velocity_mps": [6.0, 0.0, 0.0], "power": 0.48},
+        {"position_m": [-20.0, 9.0, 140.0], "velocity_mps": [0.0, -3.0, 0.0], "power": 0.58}
+      ]
+    },
+    {
+      "time": "2026-09-29T18:00:08Z",
+      "detections": [
+        {"position_m": [0.0, 64.0, 120.0], "velocity_mps": [0.0, 8.0, 0.0], "power": 0.74},
+        {"position_m": [88.0, 0.0, 95.0], "velocity_mps": [6.0, 0.0, 0.0], "power": 0.47},
+        {"position_m": [-20.0, 6.0, 140.0], "velocity_mps": [0.0, -3.0, 0.0], "power": 0.60}
+      ]
+    },
+    {
+      "time": "2026-09-29T18:00:09Z",
+      "detections": [
+        {"position_m": [0.0, 72.0, 120.0], "velocity_mps": [0.0, 8.0, 0.0], "power": 0.73},
+        {"position_m": [94.0, 0.0, 95.0], "velocity_mps": [6.0, 0.0, 0.0], "power": 0.46},
+        {"position_m": [-20.0, 3.0, 140.0], "velocity_mps": [0.0, -3.0, 0.0], "power": 0.57}
+      ]
+    },
+    {
+      "time": "2026-09-29T18:00:10Z",
+      "detections": [
+        {"position_m": [0.0, 80.0, 120.0], "velocity_mps": [0.0, 8.0, 0.0], "power": 0.72},
+        {"position_m": [100.0, 0.0, 95.0], "velocity_mps": [6.0, 0.0, 0.0], "power": 0.45},
+        {"position_m": [-20.0, 0.0, 140.0], "velocity_mps": [0.0, -3.0, 0.0], "power": 0.56}
+      ]
+    }
+  ]
+}

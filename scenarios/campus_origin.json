@@ -1,0 +1,10 @@
+{
+  "scenario": "campus_3track_10s",
+  "description": "Maps radar_local metres in hermes_pointcloud_10s.json to WGS84. HermesPy does not include this.",
+  "origin": {
+    "lat": 37.2284,
+    "lng": -80.4234,
+    "alt_m": 630.0
+  },
+  "axes": "x=east, y=north, z=up"
+}
