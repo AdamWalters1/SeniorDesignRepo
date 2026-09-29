@@ -13,7 +13,11 @@ middleware/          Pipeline we write (Python)
   associate/         Optional: keep up to 3 tracks (stretch)
   uncertainty/       Attach a position-uncertainty estimate
   publish/           InterUSS mock_uss first; other adapters later
-data/synthetic/      Timestamped lat/lng files we own
+data/synthetic/      Files we own (two shapes)
+                     hermes_pointcloud_10s.json = HermesPy-like local metres
+                     campus_3track_10s.json = after geocode (lat/lng), for publish tests
+                     example_track.json = single-point smoke test
+scenarios/           Scene origin (WGS84) used to geocode local metres
 scenarios/           Scene origin and 1–3 vehicle paths
 tests/
 ```
@@ -37,3 +41,22 @@ Internal contract (not Remote ID): `track_id`, UTC `time`, `lat`/`lng`/`alt`, op
 3. Ingest → publish
 4. Geocode, uncertainty, then association for up to 3 aircraft
 5. Dashboard last (can poll mock_uss display data)
+
+## Run the current pipeline
+
+From the repository root:
+
+```bash
+python -m middleware.pipeline data/synthetic/hermes_pointcloud_10s.json \
+  --origin scenarios/campus_origin.json \
+  --output build/normalized_tracks.json
+
+python -m unittest discover -s tests
+```
+
+This loads HermesPy-like local detections, associates at most three temporary
+tracks, converts east/north/up metres to WGS84, attaches a placeholder
+uncertainty estimate, and writes normalized JSON. The uncertainty calculation
+is for pipeline development only and is not yet a validated radar error model.
+HTTP transport to `mock_uss` is the next publisher step; the current publisher
+boundary writes inspectable JSON.
