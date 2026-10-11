@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from math import sqrt
 
+SPEED_OF_LIGHT_MPS = 299_792_458.0
+
 
 def estimate_uncertainty_m(
     power: float,
@@ -22,3 +24,15 @@ def estimate_uncertainty_m(
         return maximum_m
     estimate = reference_uncertainty_m / sqrt(power)
     return round(min(max(estimate, minimum_m), maximum_m), 2)
+
+
+def range_resolution_m(bandwidth_hz: float) -> float:
+    """Return the smallest distance a radar can separate: c / (2 * bandwidth).
+
+    Two objects closer together than this blur into one detection. It is used
+    as the range uncertainty because each measured distance can be off by up to
+    about one resolution cell. It covers range only, not direction.
+    """
+    if bandwidth_hz <= 0:
+        raise ValueError("Bandwidth must be positive")
+    return round(SPEED_OF_LIGHT_MPS / (2 * bandwidth_hz), 2)

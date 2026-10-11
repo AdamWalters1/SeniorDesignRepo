@@ -8,6 +8,7 @@ from pathlib import Path
 
 from middleware.associate.tracker import NearestNeighborTracker
 from middleware.geocode.wgs84 import local_to_wgs84
+from middleware.ingest.sionna import load_radar_detection_frames
 from middleware.ingest.synthetic import (
     load_detection_frames,
     load_origin,
@@ -30,9 +31,10 @@ def process_local_detections(
     *,
     max_tracks: int = 3,
     gate_m: float = 25.0,
+    loader=load_detection_frames,
 ) -> list[TrackPoint]:
     """Convert local point-cloud frames into normalized geospatial tracks."""
-    frames = load_detection_frames(input_path)
+    frames = loader(input_path)
     origin = load_origin(origin_path)
     tracker = NearestNeighborTracker(max_tracks=max_tracks, gate_m=gate_m)
     output: list[TrackPoint] = []
@@ -48,7 +50,11 @@ def process_local_detections(
                     speed_mps=round(horizontal_speed(detection.velocity_mps), 2),
                     heading_deg=_heading_deg(east, north),
                     vertical_speed_mps=round(up, 2),
-                    uncertainty_m=estimate_uncertainty_m(detection.power),
+                    uncertainty_m=(
+                        detection.uncertainty_m
+                        if detection.uncertainty_m is not None
+                        else estimate_uncertainty_m(detection.power)
+                    ),
                     source="hermespy-like",
                 )
             )
@@ -60,9 +66,9 @@ def main() -> None:
     parser.add_argument("input", help="Synthetic JSON input")
     parser.add_argument(
         "--format",
-        choices=("local", "geocoded"),
+        choices=("local", "geocoded", "radar"),
         default="local",
-        help="Input shape (default: local HermesPy-like frames)",
+        help="Input shape: local frames, geocoded points, or raw radar range/power",
     )
     parser.add_argument("--origin", help="Scene-origin JSON; required for local input")
     parser.add_argument(
@@ -74,14 +80,19 @@ def main() -> None:
     parser.add_argument("--gate-m", type=float, default=25.0)
     args = parser.parse_args()
 
-    if args.format == "local":
+    if args.format in ("local", "radar"):
         if not args.origin:
-            parser.error("--origin is required for local input")
+            parser.error("--origin is required for local and radar input")
         points = process_local_detections(
             args.input,
             args.origin,
             max_tracks=args.max_tracks,
             gate_m=args.gate_m,
+            loader=(
+                load_radar_detection_frames
+                if args.format == "radar"
+                else load_detection_frames
+            ),
         )
     else:
         points = load_track_points(args.input)
