@@ -1,0 +1,120 @@
+{
+  "description": "Raw HermesPy FMCW detections: range and power only, one radar.",
+  "sensor": {
+    "id": "radar1",
+    "carrier_frequency_hz": 24000000000.0,
+    "bandwidth_hz": 93090816.0
+  },
+  "frames": [
+    {
+      "time": "2026-10-12T18:00:00Z",
+      "true_range_m": 40.0,
+      "detections": [
+        {
+          "range_m": 40.73267092391305,
+          "power": 1.0193449000678503e-09
+        }
+      ]
+    },
+    {
+      "time": "2026-10-12T18:00:01Z",
+      "true_range_m": 43.0,
+      "detections": [
+        {
+          "range_m": 42.361977760869564,
+          "power": 5.695739039951191e-10
+        }
+      ]
+    },
+    {
+      "time": "2026-10-12T18:00:02Z",
+      "true_range_m": 46.0,
+      "detections": [
+        {
+          "range_m": 45.62059143478261,
+          "power": 4.1925096566771e-10
+        }
+      ]
+    },
+    {
+      "time": "2026-10-12T18:00:03Z",
+      "true_range_m": 49.0,
+      "detections": [
+        {
+          "range_m": 48.87920510869565,
+          "power": 3.969598958231542e-10
+        }
+      ]
+    },
+    {
+      "time": "2026-10-12T18:00:04Z",
+      "true_range_m": 52.0,
+      "detections": [
+        {
+          "range_m": 52.1378187826087,
+          "power": 2.9009002007108616e-10
+        }
+      ]
+    },
+    {
+      "time": "2026-10-12T18:00:05Z",
+      "true_range_m": 55.0,
+      "detections": [
+        {
+          "range_m": 55.396432456521744,
+          "power": 2.2444597912175434e-10
+        }
+      ]
+    },
+    {
+      "time": "2026-10-12T18:00:06Z",
+      "true_range_m": 58.0,
+      "detections": [
+        {
+          "range_m": 58.65504613043478,
+          "power": 1.6261718077162603e-10
+        }
+      ]
+    },
+    {
+      "time": "2026-10-12T18:00:07Z",
+      "true_range_m": 61.0,
+      "detections": [
+        {
+          "range_m": 61.91365980434783,
+          "power": 9.917568995278503e-11
+        }
+      ]
+    },
+    {
+      "time": "2026-10-12T18:00:08Z",
+      "true_range_m": 64.0,
+      "detections": [
+        {
+          "range_m": 63.542966641304346,
+          "power": 4.365764688440429e-11
+        }
+      ]
+    },
+    {
+      "time": "2026-10-12T18:00:09Z",
+      "true_range_m": 67.0,
+      "detections": [
+        {
+          "range_m": 66.8015803152174,
+          "power": 8.968326161557874e-12
+        }
+      ]
+    },
+    {
+      "time": "2026-10-12T18:00:10Z",
+      "true_range_m": 70.0,
+      "detections": [
+        {
+          "range_m": 70.06019398913044,
+          "power": 1.9426440390503935e-12
+        }
+      ]
+    }
+  ]
+}

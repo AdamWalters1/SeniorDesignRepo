@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from math import dist
 
 from middleware.models import Detection
@@ -13,6 +13,8 @@ class _TrackState:
     position_m: tuple[float, float, float]
     velocity_mps: tuple[float, float, float]
     last_time_s: float
+    seen: bool = False
+    velocity_known: bool = False
 
 
 class NearestNeighborTracker:
@@ -21,13 +23,26 @@ class NearestNeighborTracker:
     This is intentionally simple and does not claim physical aircraft
     identification. It predicts each track with constant velocity and performs
     one-to-one nearest-neighbor matching inside a distance gate.
+
+    When a detection has no velocity of its own (``velocity_mps is None``), the
+    tracker estimates it from how far the track moved since the last update.
+    The first point of a track has no earlier point, so its velocity is zero.
+    Later estimates are smoothed with ``smoothing`` (1.0 means no smoothing).
     """
 
-    def __init__(self, max_tracks: int = 3, gate_m: float = 25.0) -> None:
+    def __init__(
+        self,
+        max_tracks: int = 3,
+        gate_m: float = 25.0,
+        smoothing: float = 0.5,
+    ) -> None:
         if max_tracks < 1 or gate_m <= 0:
             raise ValueError("max_tracks and gate_m must be positive")
+        if not 0 < smoothing <= 1:
+            raise ValueError("smoothing must be between 0 and 1")
         self.max_tracks = max_tracks
         self.gate_m = gate_m
+        self.smoothing = smoothing
         self._tracks: dict[str, _TrackState] = {}
         self._next_id = 1
 
@@ -66,10 +81,37 @@ class NearestNeighborTracker:
         output: list[tuple[str, Detection]] = []
         for index, track_id in sorted(assignments.items()):
             detection = detections[index]
+            state = self._tracks[track_id]
+            velocity = detection.velocity_mps
+            velocity_known = True
+            if velocity is None:
+                velocity, velocity_known = self._estimate_velocity(state, detection)
+            detection = replace(detection, velocity_mps=velocity)
             self._tracks[track_id] = _TrackState(
                 detection.position_m,
-                detection.velocity_mps,
+                velocity,
                 detection.time.timestamp(),
+                seen=True,
+                velocity_known=velocity_known,
             )
             output.append((track_id, detection))
         return output
+
+    def _estimate_velocity(
+        self, state: _TrackState, detection: Detection
+    ) -> tuple[tuple[float, float, float], bool]:
+        """Return ``(velocity, is_known)`` from the change since the last update."""
+        dt = detection.time.timestamp() - state.last_time_s
+        if not state.seen or dt <= 0:
+            return (0.0, 0.0, 0.0), False
+        raw = tuple(
+            (detection.position_m[axis] - state.position_m[axis]) / dt
+            for axis in range(3)
+        )
+        if not state.velocity_known:
+            return raw, True
+        blended = tuple(
+            self.smoothing * raw[axis] + (1 - self.smoothing) * state.velocity_mps[axis]
+            for axis in range(3)
+        )
+        return blended, True

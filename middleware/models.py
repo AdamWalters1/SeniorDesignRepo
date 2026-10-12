@@ -27,12 +27,15 @@ class Detection:
 
     time: datetime
     position_m: tuple[float, float, float]
-    velocity_mps: tuple[float, float, float]
+    velocity_mps: tuple[float, float, float] | None
     power: float
     sensor_id: str = "unknown"
+    uncertainty_m: float | None = None
 
     def __post_init__(self) -> None:
-        if len(self.position_m) != 3 or len(self.velocity_mps) != 3:
+        if len(self.position_m) != 3 or (
+            self.velocity_mps is not None and len(self.velocity_mps) != 3
+        ):
             raise ValueError("Position and velocity must each contain x, y, and z")
         if self.power <= 0:
             raise ValueError("Detection power must be positive")
