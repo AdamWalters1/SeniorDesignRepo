@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 from math import atan2, degrees
 from pathlib import Path
+from uuid import uuid4
 
 from middleware.associate.tracker import NearestNeighborTracker
 from middleware.geocode.wgs84 import local_to_wgs84
@@ -15,7 +16,7 @@ from middleware.ingest.synthetic import (
     load_track_points,
 )
 from middleware.models import TrackPoint, horizontal_speed
-from middleware.publish.mock_uss import write_track_points
+from middleware.publish.mock_uss import publish_tracks, write_track_points
 from middleware.uncertainty.estimate import estimate_uncertainty_m
 
 
@@ -78,6 +79,24 @@ def main() -> None:
     )
     parser.add_argument("--max-tracks", type=int, default=3)
     parser.add_argument("--gate-m", type=float, default=25.0)
+    parser.add_argument(
+        "--publish",
+        action="store_true",
+        help="PUT the tracks to the local mock_uss after writing JSON",
+    )
+    parser.add_argument("--mock-uss-url", default="http://localhost:8081")
+    parser.add_argument("--oauth-url", default="http://localhost:8085")
+    parser.add_argument(
+        "--test-id",
+        default="",
+        help="Injection test id. A new id is used when this is omitted.",
+    )
+    parser.add_argument(
+        "--lead-seconds",
+        type=float,
+        default=120,
+        help="How far in the future the first published sample starts",
+    )
     args = parser.parse_args()
 
     if args.format in ("local", "radar"):
@@ -99,6 +118,16 @@ def main() -> None:
 
     write_track_points(points, args.output)
     print(f"Wrote {len(points)} points to {args.output}")
+    if args.publish:
+        test_id = args.test_id or f"pipeline-{uuid4().hex[:8]}"
+        result = publish_tracks(
+            points,
+            mock_uss_url=args.mock_uss_url,
+            oauth_url=args.oauth_url,
+            test_id=test_id,
+            lead_s=args.lead_seconds,
+        )
+        print(f"Published test {test_id} ({len(result.get('injected_flights', []))} flights)")
 
 
 if __name__ == "__main__":

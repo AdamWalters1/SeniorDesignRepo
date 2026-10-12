@@ -44,6 +44,8 @@ Internal contract (not Remote ID): `track_id`, UTC `time`, `lat`/`lng`/`alt`, op
 
 ## Run the current pipeline
 
+Machine setup, including the InterUSS sandbox, is in [SETUP.md](SETUP.md).
+
 From the repository root:
 
 ```bash
@@ -51,12 +53,16 @@ python -m middleware.pipeline data/synthetic/hermes_pointcloud_10s.json \
   --origin scenarios/campus_origin.json \
   --output build/normalized_tracks.json
 
+python -m middleware.pipeline data/hermespy/radar_fmcw_11s.json \
+  --format radar \
+  --origin scenarios/campus_origin.json \
+  --publish
+
 python -m unittest discover -s tests
 ```
 
-This loads HermesPy-like local detections, associates at most three temporary
-tracks, converts east/north/up metres to WGS84, attaches a placeholder
-uncertainty estimate, and writes normalized JSON. The uncertainty calculation
-is for pipeline development only and is not yet a validated radar error model.
-HTTP transport to `mock_uss` is the next publisher step; the current publisher
-boundary writes inspectable JSON.
+`--publish` writes the JSON file and also PUTs the tracks to the local
+mock Service Provider at `http://localhost:8081`. Sample timestamps are shifted
+so the first one starts two minutes in the future, because the DSS rejects a
+past start time. Each run uses a new test id. The sandbox from
+`interuss/monitoring` must already be running.
