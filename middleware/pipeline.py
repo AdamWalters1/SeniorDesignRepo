@@ -26,6 +26,11 @@ def _heading_deg(east_mps: float, north_mps: float) -> float | None:
     return round(degrees(atan2(east_mps, north_mps)) % 360, 2)
 
 
+def _say(enabled: bool, message: str) -> None:
+    if enabled:
+        print(message)
+
+
 def process_local_detections(
     input_path: str | Path,
     origin_path: str | Path,
@@ -33,16 +38,33 @@ def process_local_detections(
     max_tracks: int = 3,
     gate_m: float = 25.0,
     loader=load_detection_frames,
+    announce: bool = False,
 ) -> list[TrackPoint]:
     """Convert local point-cloud frames into normalized geospatial tracks."""
     frames = loader(input_path)
+    if loader is load_radar_detection_frames:
+        _say(
+            announce,
+            f"Read radar range and power from {len(frames)} frames. "
+            "Each range is placed straight north.",
+        )
+    else:
+        _say(announce, f"Read {len(frames)} local detection frames.")
     origin = load_origin(origin_path)
     tracker = NearestNeighborTracker(max_tracks=max_tracks, gate_m=gate_m)
     output: list[TrackPoint] = []
+    kept_radar_uncertainty = False
+    estimated_from_power = False
 
     for frame in frames:
         for track_id, detection in tracker.update(frame.detections):
             east, north, up = detection.velocity_mps
+            if detection.uncertainty_m is not None:
+                uncertainty_m = detection.uncertainty_m
+                kept_radar_uncertainty = True
+            else:
+                uncertainty_m = estimate_uncertainty_m(detection.power)
+                estimated_from_power = True
             output.append(
                 TrackPoint(
                     track_id=track_id,
@@ -51,14 +73,21 @@ def process_local_detections(
                     speed_mps=round(horizontal_speed(detection.velocity_mps), 2),
                     heading_deg=_heading_deg(east, north),
                     vertical_speed_mps=round(up, 2),
-                    uncertainty_m=(
-                        detection.uncertainty_m
-                        if detection.uncertainty_m is not None
-                        else estimate_uncertainty_m(detection.power)
-                    ),
+                    uncertainty_m=uncertainty_m,
                     source="hermespy-like",
                 )
             )
+    track_ids = ", ".join(sorted({point.track_id for point in output})) or "none"
+    _say(announce, f"Associated tracks: {track_ids}.")
+    _say(
+        announce,
+        f"Converted {len(output)} points to WGS84 from origin "
+        f"{origin.lat}, {origin.lng}.",
+    )
+    if kept_radar_uncertainty:
+        _say(announce, "Kept the radar range uncertainty on each point.")
+    if estimated_from_power:
+        _say(announce, "Estimated position uncertainty from detection power.")
     return output
 
 
@@ -112,13 +141,19 @@ def main() -> None:
                 if args.format == "radar"
                 else load_detection_frames
             ),
+            announce=True,
         )
     else:
         points = load_track_points(args.input)
+        print(f"Loaded {len(points)} points that are already WGS84.")
 
+    print(f"Writing {len(points)} points to {args.output}.")
     write_track_points(points, args.output)
-    print(f"Wrote {len(points)} points to {args.output}")
     if args.publish:
+        print(
+            f"Preparing to push to mock_uss. "
+            f"The first sample will start {args.lead_seconds:g} s ahead."
+        )
         test_id = args.test_id or f"pipeline-{uuid4().hex[:8]}"
         result = publish_tracks(
             points,
