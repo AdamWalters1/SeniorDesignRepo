@@ -38,3 +38,144 @@
   height: 100%;
   width: 100%;
 }
+
+
+
+.app-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.app-main {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.app-map {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+.map {
+  height: 100%;
+  width: 100%;
+}
+
+.playback-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 12px 20px;
+  background: var(--panel);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.playback-controls button {
+  padding: 8px 16px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.playback-controls button:hover {
+  background: #1d4ed8;
+}
+
+.playback-controls input[type="range"] {
+  flex: 1;
+  max-width: 500px;
+  cursor: pointer;
+  accent-color: #3b82f6;
+}
+
+.playback-controls span {
+  color: #e5e7eb;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+
+.uas-panel {
+  width: 280px;
+  flex-shrink: 0;
+  padding: 20px;
+  background: var(--panel);
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+}
+
+.uas-panel h2 {
+  font-size: 18px;
+  margin: 0 0 20px;
+}
+
+.uas-panel h3 {
+  font-size: 16px;
+  color: #60a5fa;
+}
+
+.uas-details p {
+  font-size: 13px;
+  margin: 12px 0;
+}
+
+.uas-empty {
+  font-size: 13px;
+  color: #9ca3af;
+  line-height: 1.6;
+}
+
+.uas-details button {
+  margin-top: 15px;
+  padding: 8px 12px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+@media (max-width: 700px) {
+  .app-main {
+    flex-direction: column;
+  }
+
+  .uas-panel {
+    width: auto;
+    max-height: 240px;
+    border-left: none;
+    border-top: 1px solid var(--border);
+  }
+
+  .playback-controls {
+    gap: 8px;
+    padding: 10px;
+  }
+}
+
+.header-status {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.status-connected {
+  color: #22c55e;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.status-disconnected {
+  color: #ef4444;
+  font-weight: 600;
+  font-size: 14px;
+}
