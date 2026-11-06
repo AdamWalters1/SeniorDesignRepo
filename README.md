@@ -3,7 +3,7 @@
 Team **S27-50** — publishing ISAC (or synthetic) tracks through InterUSS so a dashboard can display them. This is a data-compatibility pipeline, not a rewrite of Sionna, HermesPy, or InterUSS, and not a Remote ID implementation.
 
 ## Layout
-
+#TODO add frontend layout into this readme and direct towards that README. 
 ```
 middleware/          Pipeline we write (Python)
   models.py          Shared Detection and Track types
