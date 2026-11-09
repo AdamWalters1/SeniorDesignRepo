@@ -15,6 +15,17 @@ const CAMPUS_CENTER = [37.2275, -80.4225]
 const INITIAL_ZOOM = 17
 const SCENE_ORIGIN = [37.2284, -80.4234]
 
+// Determine drone marker color based on altitude
+function getAltitudeColor(altitude) {
+  if (altitude == null || !Number.isFinite(Number(altitude))) {
+    return '#64748b'
+  }
+
+  if (altitude < 730) return '#22c55e'  // Green - low
+  if (altitude < 760) return '#f59e0b'  // Orange - medium
+  return '#ef4444'                      // Red - high
+}
+
 export default function MapView({
   onSelectUAS,
   currentFrame,
@@ -81,6 +92,7 @@ export default function MapView({
   }
 
   return (
+  <div className="map-wrapper">
     <MapContainer
       center={CAMPUS_CENTER}
       zoom={INITIAL_ZOOM}
@@ -125,19 +137,21 @@ export default function MapView({
         />
       ))}
 
-      {/* Simulated UAS positions */}
+      
+      {/* Simulated UAS positions - altitude-based colors */}
       {currentTracks.map((track) => (
         <CircleMarker
           key={track.track_id}
           center={[track.lat, track.lng]}
-          radius={8}
+          radius={9}
           eventHandlers={{
             click: () => onSelectUAS(track),
           }}
           pathOptions={{
-            color: '#2563eb',
-            fillColor: '#2563eb',
-            fillOpacity: 0.9,
+            color: '#ffffff',
+            weight: 2.5,
+            fillColor: getAltitudeColor(track.alt),
+            fillOpacity: 1,
           }}
         >
           <Tooltip permanent direction="top">
@@ -145,6 +159,7 @@ export default function MapView({
           </Tooltip>
         </CircleMarker>
       ))}
+
 
       {/* Flight paths */}
       {Object.entries(visiblePaths).map(([trackId, positions]) => (
@@ -159,5 +174,25 @@ export default function MapView({
         />
       ))}
     </MapContainer>
+
+    <div className="altitude-legend">
+      <strong>Drone Altitude (m)</strong>
+
+      <div className="legend-item">
+        <span className="legend-dot" style={{ backgroundColor: '#22c55e' }} />
+        <span>Below 730 m</span>
+      </div>
+
+      <div className="legend-item">
+        <span className="legend-dot" style={{ backgroundColor: '#f59e0b' }} />
+        <span>730–759 m</span>
+      </div>
+
+      <div className="legend-item">
+        <span className="legend-dot" style={{ backgroundColor: '#ef4444' }} />
+        <span>760 m and above</span>
+      </div>
+    </div>
+  </div>
   )
 }
