@@ -51,6 +51,7 @@ def _clean_point(raw: Any) -> dict[str, Any] | None:
         "vertical_speed_mps": _optional_number(raw, "vertical_speed_mps"),
         "uncertainty_m": _optional_number(raw, "uncertainty_m"),
         "source": raw.get("source"),
+        "source_meta": raw.get("source_meta") if isinstance(raw.get("source_meta"), dict) else None,
     }
 
 

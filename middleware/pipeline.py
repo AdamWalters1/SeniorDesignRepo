@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import logging
 from math import atan2, degrees
 from pathlib import Path
 from uuid import uuid4
@@ -15,7 +16,9 @@ from middleware.ingest.synthetic import (
     load_origin,
     load_track_points,
 )
-from middleware.models import TrackPoint, horizontal_speed
+from dataclasses import replace
+
+from middleware.models import GeoPoint, SourceMeta, TrackPoint, horizontal_speed
 from middleware.publish.mock_uss import publish_tracks, write_track_points
 from middleware.uncertainty.estimate import estimate_uncertainty_m
 
@@ -24,6 +27,20 @@ def _heading_deg(east_mps: float, north_mps: float) -> float | None:
     if east_mps == 0 and north_mps == 0:
         return None
     return round(degrees(atan2(east_mps, north_mps)) % 360, 2)
+
+
+def _meta_with_wgs84(
+    meta: SourceMeta | None, origin: GeoPoint, cache: dict[int, SourceMeta]
+) -> SourceMeta | None:
+    """Add the sensor's lat/lng to its metadata (one copy per source)."""
+    if meta is None or meta.sensor_position_m is None:
+        return meta
+    key = id(meta)
+    if key not in cache:
+        cache[key] = replace(
+            meta, sensor_position_wgs84=local_to_wgs84(meta.sensor_position_m, origin)
+        )
+    return cache[key]
 
 
 def _say(enabled: bool, message: str) -> None:
@@ -41,7 +58,10 @@ def process_local_detections(
     announce: bool = False,
 ) -> list[TrackPoint]:
     """Convert local point-cloud frames into normalized geospatial tracks."""
-    frames = loader(input_path)
+    issues: list[str] = []
+    frames = loader(input_path, issues=issues)
+    if issues:
+        _say(announce, f"Skipped {len(issues)} invalid readings. See the log lines above.")
     if loader is load_radar_detection_frames:
         _say(
             announce,
@@ -54,6 +74,7 @@ def process_local_detections(
     tracker = NearestNeighborTracker(max_tracks=max_tracks, gate_m=gate_m)
     output: list[TrackPoint] = []
     kept_radar_uncertainty = False
+    sensor_wgs84_cache: dict[int, SourceMeta] = {}
     estimated_from_power = False
 
     for frame in frames:
@@ -75,6 +96,9 @@ def process_local_detections(
                     vertical_speed_mps=round(up, 2),
                     uncertainty_m=uncertainty_m,
                     source="hermespy-like",
+                    source_meta=_meta_with_wgs84(
+                        detection.source_meta, origin, sensor_wgs84_cache
+                    ),
                 )
             )
     track_ids = ", ".join(sorted({point.track_id for point in output})) or "none"
@@ -113,6 +137,11 @@ def main() -> None:
         action="store_true",
         help="PUT the tracks to the local mock_uss after writing JSON",
     )
+    parser.add_argument(
+        "--no-metadata-in-report",
+        action="store_true",
+        help="Leave source metadata out of the published report details",
+    )
     parser.add_argument("--mock-uss-url", default="http://localhost:8081")
     parser.add_argument("--oauth-url", default="http://localhost:8085")
     parser.add_argument(
@@ -127,6 +156,7 @@ def main() -> None:
         help="How far in the future the first published sample starts",
     )
     args = parser.parse_args()
+    logging.basicConfig(level=logging.WARNING, format="%(levelname)s %(message)s")
 
     if args.format in ("local", "radar"):
         if not args.origin:
@@ -161,6 +191,7 @@ def main() -> None:
             oauth_url=args.oauth_url,
             test_id=test_id,
             lead_s=args.lead_seconds,
+            include_metadata=not args.no_metadata_in_report,
         )
         print(f"Published test {test_id} ({len(result.get('injected_flights', []))} flights)")
 

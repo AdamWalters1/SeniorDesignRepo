@@ -2,8 +2,11 @@
   "description": "Raw HermesPy FMCW detections: range and power only, one radar.",
   "sensor": {
     "id": "radar1",
+    "type": "radar",
+    "signal_type": "FMCW",
     "carrier_frequency_hz": 24000000000.0,
-    "bandwidth_hz": 93090816.0
+    "bandwidth_hz": 93090816.0,
+    "range_resolution_m": 1.61
   },
   "frames": [
     {
