@@ -67,6 +67,7 @@ def shift_to_future(
             vertical_speed_mps=point.vertical_speed_mps,
             uncertainty_m=point.uncertainty_m,
             source=point.source,
+            source_meta=point.source_meta,
         )
         for point in points
     ]
@@ -100,6 +101,7 @@ def _with_area(points: list[TrackPoint]) -> list[TrackPoint]:
             vertical_speed_mps=last.vertical_speed_mps,
             uncertainty_m=last.uncertainty_m,
             source=last.source,
+            source_meta=last.source_meta,
         ),
     ]
 
@@ -136,11 +138,23 @@ def _telemetry(point: TrackPoint) -> dict:
     }
 
 
-def build_injection_body(points: list[TrackPoint]) -> dict:
-    """Build the mock_uss test-injection body used by the working sandbox call."""
+def build_injection_body(points: list[TrackPoint], *, include_metadata: bool = True) -> dict:
+    """Build the mock_uss test-injection body used by the working sandbox call.
+
+    When the track carries source metadata, a one-line summary goes in the
+    standard ``operation_description`` text field of the flight details. No
+    new field names are added, so the report keeps its existing shape.
+    """
     flights = []
     for track_id, track_points in group_by_track(points).items():
         reported = _with_area(track_points)
+        details = {
+            "id": track_id,
+            "uas_id": {"utm_id": track_id},
+        }
+        meta = reported[0].source_meta
+        if include_metadata and meta is not None:
+            details["operation_description"] = meta.describe()
         flights.append(
             {
                 "injection_id": track_id,
@@ -148,10 +162,7 @@ def build_injection_body(points: list[TrackPoint]) -> dict:
                 "details_responses": [
                     {
                         "effective_after": format_utc(reported[0].time),
-                        "details": {
-                            "id": track_id,
-                            "uas_id": {"utm_id": track_id},
-                        },
+                        "details": details,
                     }
                 ],
             }
@@ -191,9 +202,12 @@ def publish_tracks(
     oauth_url: str = "http://localhost:8085",
     test_id: str,
     lead_s: float = 120,
+    include_metadata: bool = True,
 ) -> dict:
     """Shift times forward and PUT one injection covering every track."""
-    body = build_injection_body(shift_to_future(points, lead_s=lead_s))
+    body = build_injection_body(
+        shift_to_future(points, lead_s=lead_s), include_metadata=include_metadata
+    )
     token = fetch_token(oauth_url)
     url = f"{mock_uss_url.rstrip('/')}/ridsp/injection/tests/{test_id}"
     return _request_json("PUT", url, body, token)

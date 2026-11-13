@@ -8,7 +8,7 @@ from middleware.models import TrackPoint, format_utc
 def track_point_to_payload(point: TrackPoint):
     """Convert one aircraft tracking point into a USS-style format."""
 
-    return {
+    payload = {
         "track_id": point.track_id,
 
         "timestamp": format_utc(point.time),
@@ -29,6 +29,9 @@ def track_point_to_payload(point: TrackPoint):
 
         "source": point.source,
     }
+    if point.source_meta is not None:
+        payload["source_meta"] = point.source_meta.describe()
+    return payload
 
 def build_injection_payload(points: list[TrackPoint]):
     """Put multiple aircraft tracking points into one payload."""
