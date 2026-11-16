@@ -1,6 +1,8 @@
 
 import { useState, useEffect } from 'react'
 import MapView from './components/MapView.jsx'
+import SourceDetails from './components/SourceDetails.jsx'
+import { formatValue } from './utils/format.js'
 import './App.css'
 
 export default function App() {
@@ -92,13 +94,16 @@ export default function App() {
               <div className="uas-details">
                 <h3>Track {displayedUAS.track_id}</h3>
 
-                <p><strong>Latitude:</strong> {displayedUAS.lat.toFixed(6)}°</p>
-                <p><strong>Longitude:</strong> {displayedUAS.lng.toFixed(6)}°</p>
-                <p><strong>Speed:</strong> {displayedUAS.speed_mps} m/s</p>
-                <p><strong>Heading:</strong> {displayedUAS.heading_deg}°</p>
-                <p><strong>Altitude:</strong> {displayedUAS.alt} m</p>
-                <p><strong>Uncertainty:</strong> {displayedUAS.uncertainty_m} m</p>
-                <p><strong>Timestamp:</strong> {displayedUAS.time}</p>
+                <h4 className="uas-section">Position and motion</h4>
+                <p><strong>Latitude:</strong> {formatValue(displayedUAS.lat, '°', 6)}</p>
+                <p><strong>Longitude:</strong> {formatValue(displayedUAS.lng, '°', 6)}</p>
+                <p><strong>Speed:</strong> {formatValue(displayedUAS.speed_mps, 'm/s')}</p>
+                <p><strong>Heading:</strong> {formatValue(displayedUAS.heading_deg, '°')}</p>
+                <p><strong>Altitude:</strong> {formatValue(displayedUAS.alt, 'm')}</p>
+                <p><strong>Uncertainty:</strong> {formatValue(displayedUAS.uncertainty_m, 'm')}</p>
+                <p><strong>Timestamp:</strong> {formatValue(displayedUAS.time)}</p>
+
+                <SourceDetails point={displayedUAS} />
 
                 <button onClick={() => setSelectedUAS(null)}>
                   Clear Selection

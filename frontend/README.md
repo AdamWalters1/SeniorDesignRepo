@@ -30,6 +30,8 @@ frontend/
 
 - `App.jsx` — Main application component. Manages selected drones, playback controls, timeline state, and backend connection status.
 - `components/MapView.jsx` — Displays the interactive map, drone markers, flight paths, uncertainty circles, and altitude legend.
+- `components/SourceDetails.jsx` — Source sensor and antenna array section of the selected UAS panel.
+- `utils/format.js` — Display helpers. A missing value shows as a dash.
 - `App.css` — Controls the dashboard layout, colors, styling, and map saturation.
 - `main.jsx` — Entry point for the React application.
 - `vite.config.js` — Configures Vite and forwards API requests to the FastAPI backend.
@@ -190,6 +192,10 @@ Displayed fields include:
 - Position uncertainty
 - Timestamp
 - Data source, when available
+- Source sensor: sensor ID and type, signal type, carrier frequency, bandwidth, range resolution, sensor position (east, north, up and latitude, longitude, altitude), and whether that position was assumed
+- Antenna array: layout, number of elements, transmit and receive elements, polarization, and each element's position from the array center
+
+Any value the data does not have is shown as a dash (`-`). The source sensor and antenna array fields come from the optional `source_meta` block on each track point (see `docs/INTERFACES.md`).
 
 The selected drone's information updates as playback progresses.
 

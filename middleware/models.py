@@ -37,12 +37,51 @@ class GeoPoint:
 
 
 @dataclass(frozen=True)
+class AntennaArray:
+    """The sensor's antenna setup. Every field may be None (not known).
+
+    ``layout`` is free text, rows by columns, for example ``"2x2"``. When the
+    transmit and receive antennas are separate arrays, write both, for example
+    ``"1x1 TX + 1x1 RX"``.
+    ``num_elements`` counts every element (transmit and receive together).
+    ``tx_elements`` and ``rx_elements`` list element numbers, counting from 0.
+    One element may be in both lists (it sends and listens).
+    ``element_positions_m`` has one east, north, up offset per element, in
+    metres from the array center. The array center is the sensor position
+    (``sensor_position_m``). The array's own tilt is not carried.
+    """
+
+    layout: str | None = None
+    num_elements: int | None = None
+    tx_elements: tuple[int, ...] | None = None
+    rx_elements: tuple[int, ...] | None = None
+    polarization: str | None = None
+    element_positions_m: tuple[tuple[float, float, float], ...] | None = None
+
+    def describe(self) -> list[str]:
+        """Return short ``name=value`` parts for free-text summaries."""
+        parts = []
+        if self.layout:
+            parts.append(f"array={self.layout.replace(' + ', '+').replace(' ', '_')}")
+        if self.num_elements is not None:
+            parts.append(f"elements={self.num_elements}")
+        if self.tx_elements is not None:
+            parts.append("tx=" + ",".join(str(i) for i in self.tx_elements))
+        if self.rx_elements is not None:
+            parts.append("rx=" + ",".join(str(i) for i in self.rx_elements))
+        if self.polarization:
+            parts.append(f"pol={self.polarization}")
+        return parts
+
+
+@dataclass(frozen=True)
 class SourceMeta:
     """Where a reading came from. Every field except sensor_id may be None.
 
     ``sensor_position_m`` is east, north, up in the local scene frame.
     ``sensor_position_assumed`` is True when the input file did not state the
     position and the ingest used its default.
+    ``antenna_array`` is None when the input file gave no antenna information.
     """
 
     sensor_id: str = "unknown"
@@ -54,6 +93,7 @@ class SourceMeta:
     sensor_position_m: tuple[float, float, float] | None = None
     sensor_position_assumed: bool = False
     sensor_position_wgs84: "GeoPoint | None" = None
+    antenna_array: AntennaArray | None = None
 
     def describe(self) -> str:
         """Return one short line for places that only accept free text."""
@@ -68,6 +108,8 @@ class SourceMeta:
             parts.append(f"bandwidth={self.bandwidth_hz / 1e6:.1f} MHz")
         if self.range_resolution_m:
             parts.append(f"range_res={self.range_resolution_m:g} m")
+        if self.antenna_array is not None:
+            parts.extend(self.antenna_array.describe())
         kind = "Radar" if self.sensor_type == "radar" else "Sensor"
         return f"{kind}-derived track, " + " ".join(parts)
 

@@ -55,8 +55,27 @@ Describes where the readings came from. It is optional and every field in it is 
 | `bandwidth_hz` | number above 0 | Used to compute the range resolution, c / (2 x bandwidth) |
 | `range_resolution_m` | number above 0 | Used only when `bandwidth_hz` is absent |
 | `position_m` | `[x, y, z]` metres | Sensor position. If absent, the default above is used and flagged as assumed |
+| `antenna_array` | object | Antenna setup. See 1.4.1. Optional |
 
 A field that is missing or invalid is ignored and logged. It never stops the run.
+
+#### 1.4.1 The `antenna_array` object
+
+Optional, and every field in it is optional. A sensor with no array information leaves it out.
+
+| Field | Type | Meaning |
+|---|---|---|
+| `layout` | text | Rows by columns, for example `2x2`. For separate transmit and receive arrays write both, for example `1x1 TX + 1x1 RX` |
+| `num_elements` | whole number, 1 or more | Total antenna elements, transmit and receive together |
+| `tx_elements` | list of whole numbers | Which elements transmit, counting from 0. An empty list means none |
+| `rx_elements` | list of whole numbers | Which elements receive, counting from 0. One element can be in both lists |
+| `polarization` | text | For example `V` (vertical), `H` (horizontal), `VH` |
+| `element_positions_m` | list of `[east, north, up]` | One offset per element, in metres from the array center. The array center is the sensor position. The array's own tilt is not carried |
+
+A bad field is ignored and logged (`Ignored optional field: antenna_array.<name>`). The other
+fields are kept and no reading is skipped. When `num_elements` is valid, an element number
+at or above it makes that list ignored, and `element_positions_m` must have exactly
+`num_elements` offsets. If nothing usable is left, the array is treated as absent.
 
 ### 1.5 Skipped readings
 
@@ -97,7 +116,7 @@ A whole frame is skipped when it is not an object, `time` is missing or not text
 | `source` | text | Where the point came from |
 | `source_meta` | object | Optional. Present when the input described its sensor |
 
-`source_meta` fields: `sensor_id`, `sensor_type`, `signal_type`, `carrier_frequency_hz`, `bandwidth_hz`, `range_resolution_m`, `sensor_position_m`, `sensor_position_assumed` (true when the position was a default), and `sensor_position_wgs84` (`lat`, `lng`, `alt_m`).
+`source_meta` fields: `sensor_id`, `sensor_type`, `signal_type`, `carrier_frequency_hz`, `bandwidth_hz`, `range_resolution_m`, `sensor_position_m`, `sensor_position_assumed` (true when the position was a default), and `sensor_position_wgs84` (`lat`, `lng`, `alt_m`), and `antenna_array` (the object in 1.4.1, or `null` when the input gave none).
 
 ## 4. Publish to InterUSS
 
@@ -126,7 +145,7 @@ Request body, one entry per track:
 
 - `operational_status` is `Airborne` when altitude is above 0, otherwise `Ground`.
 - `track` is `heading_deg`, or 0 when the heading is null.
-- `operation_description` holds the one-line source description (from `source_meta`). It is left out when there is no metadata or when `--no-metadata-in-report` is set.
+- `operation_description` holds the one-line source description (from `source_meta`, including `array=`, `elements=`, `tx=`, `rx=` and `pol=` when an antenna array is given). It is left out when there is no metadata or when `--no-metadata-in-report` is set.
 - `accuracy_h` comes from `uncertainty_m` and is never tighter than the metre value:
 
 | `uncertainty_m` | `accuracy_h` |
@@ -173,6 +192,7 @@ Errors: `404` when the track file is missing (run the pipeline first), `422` whe
 | `ingest.synthetic.load_track_points(path)` | geocoded file path | `list[TrackPoint]` |
 | `ingest.synthetic.load_origin(path)` | origin file path | `GeoPoint` |
 | `ingest.synthetic.read_source_meta(sensor, issues=None, *, default_position_m=None)` | a `sensor` block | `SourceMeta` |
+| `ingest.synthetic.read_antenna_array(raw)` | an `antenna_array` object | `AntennaArray`, or `None` when absent or unusable |
 | `associate.tracker.NearestNeighborTracker(max_tracks=3, gate_m=25.0, smoothing=0.5).update(detections)` | the detections of one frame | `list[(track_id, Detection)]` |
 | `geocode.wgs84.local_to_wgs84(position_m, origin)` | east, north, up metres and a `GeoPoint` | `GeoPoint` |
 | `uncertainty.estimate.estimate_uncertainty_m(power, ...)` | detection power | metres, between 3 and 100 by default |
@@ -181,4 +201,4 @@ Errors: `404` when the track file is missing (run the pipeline first), `422` whe
 | `publish.mock_uss.publish_tracks(points, *, mock_uss_url, oauth_url, test_id, lead_s=120, include_metadata=True)` | `list[TrackPoint]` | the sandbox reply (`dict`) |
 | `pipeline.process_local_detections(input_path, origin_path, *, max_tracks=3, gate_m=25.0, loader=..., announce=False)` | input and origin paths | `list[TrackPoint]` |
 
-Data types are in `middleware/models.py`: `Detection`, `DetectionFrame`, `TrackPoint`, `GeoPoint`, `SourceMeta`.
+Data types are in `middleware/models.py`: `Detection`, `DetectionFrame`, `TrackPoint`, `GeoPoint`, `SourceMeta`, `AntennaArray`.

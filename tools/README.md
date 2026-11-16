@@ -49,7 +49,10 @@ The script prints a WARNING when your settings hit it.
 
 ## Sensor block written to the file
 
-`id`, `type`, `signal_type`, `carrier_frequency_hz`, `bandwidth_hz`, `range_resolution_m`.
+`id`, `type`, `signal_type`, `carrier_frequency_hz`, `bandwidth_hz`, `range_resolution_m`, `antenna_array`.
+The `antenna_array` block is HermesPy's default device antenna: one ideal element that sends and
+listens, layout `1x1`, at offset (0, 0, 0). This script never sets antennas, so that default is
+what runs. The ideal antenna showed no polarization setting in HermesPy 1.6.0, so the field is left out.
 The radar position is not written because the simulation has no position.
 The middleware assumes (0, 0, 25) m east, north, up and marks it as assumed.
 
@@ -84,6 +87,10 @@ What comes from where:
   0.59 m and 0.5 m/s for FMCW (`--waveform`). Sionna itself has no noise.
 - **Assumptions, marked in the script:** radar power, antenna gain and noise figure (they set
   how far the radar sees), and a 1 degree angle error (the study had no angle).
+- **Antenna setup, written to the sensor block as `antenna_array`:** the same values the script
+  gives Sionna. One transmit antenna at the sensor position, one receive antenna 0.5 m east of it
+  (`RX_OFFSET_M`), vertical polarization. Element offsets are measured from the sensor position.
+  If you change these constants, the block follows.
 
 ## Setup
 

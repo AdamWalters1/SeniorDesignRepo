@@ -128,6 +128,50 @@
   margin: 12px 0;
 }
 
+.uas-section {
+  margin: 20px 0 4px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #9ca3af;
+}
+
+.uas-details .uas-section:first-of-type {
+  margin-top: 8px;
+  padding-top: 0;
+  border-top: none;
+}
+
+.uas-missing {
+  color: #6b7280;
+}
+
+.element-table {
+  width: 100%;
+  margin-top: 4px;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.element-table th,
+.element-table td {
+  padding: 3px 4px;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+}
+
+.element-table th:last-child,
+.element-table td:last-child {
+  text-align: left;
+}
+
+.element-table th {
+  color: #9ca3af;
+  font-weight: 500;
+}
+
 .uas-empty {
   font-size: 13px;
   color: #9ca3af;
