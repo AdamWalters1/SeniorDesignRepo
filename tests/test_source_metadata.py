@@ -48,7 +48,7 @@ class RadarMetadataTests(_Temp):
         meta = self.points[0].source_meta
         self.assertEqual(meta.sensor_position_m, (0.0, 0.0, 25.0))
         self.assertTrue(meta.sensor_position_assumed)
-        self.assertAlmostEqual(meta.sensor_position_wgs84.lat, 37.2284)
+        self.assertAlmostEqual(meta.sensor_position_wgs84.lat, json.loads(ORIGIN.read_text())["origin"]["lat"])
         self.assertAlmostEqual(meta.sensor_position_wgs84.alt_m, 655.0)
 
     def test_old_fields_are_unchanged(self) -> None:

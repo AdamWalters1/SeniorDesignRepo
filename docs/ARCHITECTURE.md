@@ -172,6 +172,7 @@ classDiagram
         +float power
         +str sensor_id
         +float uncertainty_m
+        +float radial_speed_mps
     }
     class SourceMeta {
         +str sensor_id
@@ -215,11 +216,11 @@ classDiagram
 
 ## 8. Not built yet
 
-- Reading Sionna output. Today the input is a HermesPy radar file, a local frames file, or a geocoded file.
+- Reading Sionna output directly. `tools/sionna_scene_run.py` turns the campus Sionna scene into a local frames file, and the pipeline reads that file.
 - The frontend finding the Service Provider through the DSS and polling it. Today it reads the track file.
 - A real DSS client. The sandbox injection route is the publish path.
 - Direction from a single radar. Each range is placed straight north.
-- Using Doppler speed in the tracker. Speed comes from position changes.
+- Using Doppler speed beyond the first prediction. A new track predicts its second point with the Doppler speed. After that, speed comes from position changes.
 
 ## 9. Which file to update
 

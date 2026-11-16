@@ -1,9 +1,9 @@
 {
   "scenario": "campus_3track_10s",
-  "description": "Maps radar_local metres in hermes_pointcloud_10s.json to WGS84. HermesPy does not include this.",
+  "description": "Maps radar_local metres to WGS84. Origin is the Blender/Sionna campus scene origin (centre of the OpenStreetMap extent the scene was built from).",
   "origin": {
-    "lat": 37.2284,
-    "lng": -80.4234,
+    "lat": 37.228594,
+    "lng": -80.424904,
     "alt_m": 630.0
   },
   "axes": "x=east, y=north, z=up"

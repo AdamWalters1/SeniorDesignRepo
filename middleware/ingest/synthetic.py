@@ -64,6 +64,20 @@ def read_vector(item: dict[str, Any], name: str) -> tuple[float, float, float]:
     return tuple(read_number({name: v}, name) for v in value)
 
 
+def read_optional_number(item: dict[str, Any], name: str) -> float | None:
+    """Return a finite number from ``item[name]``, or None when absent or invalid.
+
+    An invalid value is logged and ignored. It never skips the reading.
+    """
+    if name not in item:
+        return None
+    try:
+        return read_number(item, name)
+    except ValueError as error:
+        logger.warning("Ignored optional field: %s", error)
+        return None
+
+
 def read_power(item: dict[str, Any]) -> float:
     """Return a positive power or raise ValueError."""
     power = read_number(item, "power")
@@ -174,10 +188,11 @@ def load_detection_frames(
                     Detection(
                         time=time,
                         position_m=read_vector(item, "position_m"),
-                        velocity_mps=read_vector(item, "velocity_mps"),
+                        velocity_mps=(read_vector(item, "velocity_mps") if "velocity_mps" in item else None),
                         power=read_power(item),
                         sensor_id=sensor_id,
                         source_meta=source_meta,
+                        radial_speed_mps=read_optional_number(item, "radial_speed_mps"),
                     )
                 )
             except ValueError as error:

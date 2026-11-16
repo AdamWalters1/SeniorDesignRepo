@@ -10,19 +10,22 @@ middleware/          Pipeline we write (Python, standard library only)
   models.py          Shared types: Detection, TrackPoint, GeoPoint, SourceMeta
   pipeline.py        Wires ingest → associate → geocode → uncertainty → track file → publish
   ingest/            Reads input files: local metres, HermesPy radar frames, geocoded points
-  associate/         Nearest-neighbor tracker: up to 3 tracks, 25 m gate, speed from position change
+  associate/         Nearest-neighbor tracker: up to 3 tracks, 25 m gate, speed from position change, first prediction from Doppler
   geocode/           Local x/y/z + scene origin → lat/lng/alt
   uncertainty/       Position uncertainty (radar keeps its range resolution, other input is estimated from power)
   publish/           mock_uss.py writes the track file and PUTs the injection to the sandbox
                      interuss_adapter.py is a prototype payload converter used by interuss_demo.py, not by --publish
 dashboard_api/       FastAPI service that serves build/normalized_tracks.json to the map
 frontend/            React and Leaflet map (see frontend/README.md)
-tools/               radar_intake.py runs HermesPy and writes a radar input file (see tools/README.md)
+tools/               radar_intake.py runs HermesPy and writes a radar input file
+                     sionna_scene_run.py flies drones through the campus Sionna scene (see tools/README.md)
 data/hermespy/       radar_fmcw_11s.json = HermesPy FMCW range and power, with a sensor block
+data/sionna/         campus_2drone_10s.json = Sionna scene echoes for 2 crossing aircraft (local metres), with the true positions beside it
 data/synthetic/      hermes_pointcloud_10s.json = HermesPy-like local metres
                      campus_3track_10s.json = after geocode (lat/lng), for publish tests
                      example_track.json = single-point smoke test
 scenarios/           campus_origin.json = scene origin (WGS84) used to geocode local metres
+                     campus_2drone_10s.json = the aircraft paths that sionna_scene_run.py flies
 tests/               Unit tests, run with: python -m unittest discover -s tests
 docs/                ARCHITECTURE.md (how the pieces connect) and INTERFACES.md (every file and message format)
 .github/             Pull request checklist: update the docs when a file, call, or module changes

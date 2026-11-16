@@ -247,8 +247,8 @@ Example response structure:
         {
           "track_id": "t1",
           "time": "2026-09-29T18:00:00Z",
-          "lat": 37.2284,
-          "lng": -80.4234,
+          "lat": 37.228594,
+          "lng": -80.424904,
           "alt": 750,
           "speed_mps": 8,
           "heading_deg": 0,

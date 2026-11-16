@@ -11,9 +11,9 @@ import {
 } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 
-const CAMPUS_CENTER = [37.2275, -80.4225]
+const CAMPUS_CENTER = [37.228594, -80.424904]
 const INITIAL_ZOOM = 17
-const SCENE_ORIGIN = [37.2284, -80.4234]
+const SCENE_ORIGIN = [37.228594, -80.424904]
 
 // Determine drone marker color based on altitude
 function getAltitudeColor(altitude) {
