@@ -82,6 +82,16 @@ document = {
         "carrier_frequency_hz": 24e9,
         "bandwidth_hz": device.bandwidth,
         "range_resolution_m": round(299_792_458.0 / (2 * device.bandwidth), 2),
+        # HermesPy's default device antenna: one ideal element that sends and listens.
+        # This script never sets antennas. Polarization is not recorded by HermesPy's
+        # ideal antenna, so it is left out.
+        "antenna_array": {
+            "layout": "1x1",
+            "num_elements": 1,
+            "tx_elements": [0],
+            "rx_elements": [0],
+            "element_positions_m": [[0.0, 0.0, 0.0]],
+        },
     },
     "frames": frames,
 }

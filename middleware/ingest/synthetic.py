@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from middleware.models import Detection, GeoPoint, SourceMeta, TrackPoint, parse_utc
+from middleware.models import AntennaArray, Detection, GeoPoint, SourceMeta, TrackPoint, parse_utc
 from middleware.uncertainty.estimate import range_resolution_m
 
 logger = logging.getLogger("middleware.ingest")
@@ -120,6 +120,92 @@ def _optional_text(sensor: dict[str, Any], name: str) -> str | None:
     return value if isinstance(value, str) and value else None
 
 
+def _ignore_antenna_field(name: str, reason: str) -> None:
+    """Log one ignored antenna field. The reading itself is never skipped."""
+    logger.warning("Ignored optional field: antenna_array.%s, %s", name, reason)
+
+
+def _antenna_text(raw: dict[str, Any], name: str) -> str | None:
+    value = raw.get(name)
+    if value is None:
+        return None
+    if isinstance(value, str) and value.strip():
+        return value.strip()
+    _ignore_antenna_field(name, f"must be non-empty text, got {value!r}")
+    return None
+
+
+def _antenna_whole_number(value: Any) -> int | None:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return None
+    if isinstance(value, float) and not value.is_integer():
+        return None
+    return int(value)
+
+
+def _antenna_element_list(raw: dict[str, Any], name: str, count: int | None):
+    """Return a tuple of element numbers, or None (logged) when the list is bad."""
+    value = raw.get(name)
+    if value is None:
+        return None
+    numbers = None
+    if isinstance(value, (list, tuple)):
+        numbers = [_antenna_whole_number(v) for v in value]
+    if numbers is None or any(n is None or n < 0 for n in numbers):
+        _ignore_antenna_field(name, f"must be a list of whole numbers 0 or more, got {value!r}")
+        return None
+    if count is not None and any(n >= count for n in numbers):
+        _ignore_antenna_field(name, f"element number is not below num_elements {count}, got {value!r}")
+        return None
+    return tuple(numbers)
+
+
+def _antenna_positions(raw: dict[str, Any], count: int | None):
+    """Return one east, north, up offset per element, or None (logged) when bad."""
+    value = raw.get("element_positions_m")
+    if value is None:
+        return None
+    try:
+        if not isinstance(value, (list, tuple)):
+            raise ValueError("must be a list of [east, north, up] offsets")
+        positions = tuple(read_vector({"p": v}, "p") for v in value)
+        if count is not None and len(positions) != count:
+            raise ValueError(f"has {len(positions)} offsets but num_elements is {count}")
+    except ValueError as error:
+        _ignore_antenna_field("element_positions_m", f"{error}, got {value!r}")
+        return None
+    return positions
+
+
+def read_antenna_array(raw: Any) -> AntennaArray | None:
+    """Build AntennaArray from a sensor block's ``antenna_array`` object.
+
+    Everything here is optional. A bad field is logged and ignored, the other
+    fields are kept, and the reading is never skipped. Returns None when
+    nothing usable is given.
+    """
+    if raw is None:
+        return None
+    if not isinstance(raw, dict):
+        _ignore_antenna_field("(whole block)", f"must be an object, got {raw!r}")
+        return None
+    count = None
+    if raw.get("num_elements") is not None:
+        count = _antenna_whole_number(raw["num_elements"])
+        if count is None or count < 1:
+            _ignore_antenna_field("num_elements", f"must be a whole number 1 or more, got {raw['num_elements']!r}")
+            count = None
+    array = AntennaArray(
+        layout=_antenna_text(raw, "layout"),
+        num_elements=count,
+        tx_elements=_antenna_element_list(raw, "tx_elements", count),
+        rx_elements=_antenna_element_list(raw, "rx_elements", count),
+        polarization=_antenna_text(raw, "polarization"),
+        element_positions_m=_antenna_positions(raw, count),
+    )
+    return array if array != AntennaArray() else None
+
+
 def read_source_meta(
     sensor: Any,
     issues: list[str] | None = None,
@@ -160,6 +246,7 @@ def read_source_meta(
         range_resolution_m=resolution,
         sensor_position_m=position,
         sensor_position_assumed=assumed,
+        antenna_array=read_antenna_array(sensor.get("antenna_array")),
     )
 
 
@@ -240,6 +327,7 @@ def _geocoded_meta(raw: Any) -> SourceMeta | None:
         sensor_position_m=position,
         sensor_position_assumed=raw.get("sensor_position_assumed") is True,
         sensor_position_wgs84=geo,
+        antenna_array=read_antenna_array(raw.get("antenna_array")),
     )
 
 

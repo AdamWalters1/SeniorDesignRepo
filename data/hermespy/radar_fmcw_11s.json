@@ -6,7 +6,24 @@
     "signal_type": "FMCW",
     "carrier_frequency_hz": 24000000000.0,
     "bandwidth_hz": 93090816.0,
-    "range_resolution_m": 1.61
+    "range_resolution_m": 1.61,
+    "antenna_array": {
+      "layout": "1x1",
+      "num_elements": 1,
+      "tx_elements": [
+        0
+      ],
+      "rx_elements": [
+        0
+      ],
+      "element_positions_m": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ]
+    }
   },
   "frames": [
     {

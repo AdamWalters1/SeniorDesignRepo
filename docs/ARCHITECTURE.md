@@ -59,7 +59,7 @@ Each has one job.
 
 | Module | Job | Reads | Gives back |
 |---|---|---|---|
-| `ingest/synthetic.py` | Read local or geocoded files, build `SourceMeta`, skip invalid readings | Input file | `DetectionFrame` list or `TrackPoint` list |
+| `ingest/synthetic.py` | Read local or geocoded files, build `SourceMeta` (with the optional `AntennaArray`), skip invalid readings | Input file | `DetectionFrame` list or `TrackPoint` list |
 | `ingest/sionna.py` | Read radar range and power, place each reading on the map | Radar file | `DetectionFrame` list |
 | `associate/tracker.py` | Give detections track ids, estimate speed | Detections of one frame | `(track_id, Detection)` pairs |
 | `geocode/wgs84.py` | East, north, up metres to latitude, longitude, altitude | Position and scene origin | `GeoPoint` |
@@ -174,6 +174,14 @@ classDiagram
         +float uncertainty_m
         +float radial_speed_mps
     }
+    class AntennaArray {
+        +str layout
+        +int num_elements
+        +tuple tx_elements
+        +tuple rx_elements
+        +str polarization
+        +tuple element_positions_m
+    }
     class SourceMeta {
         +str sensor_id
         +str sensor_type
@@ -183,6 +191,7 @@ classDiagram
         +float range_resolution_m
         +tuple sensor_position_m
         +bool sensor_position_assumed
+        +AntennaArray antenna_array
         +describe() str
     }
     class GeoPoint {
@@ -209,6 +218,7 @@ classDiagram
     DetectionFrame --> Detection : holds many
     Detection --> SourceMeta : optional
     SourceMeta --> GeoPoint : sensor_position_wgs84, optional
+    SourceMeta --> AntennaArray : optional
     TrackPoint --> GeoPoint : position
     TrackPoint --> SourceMeta : optional
     NearestNeighborTracker ..> Detection : reads

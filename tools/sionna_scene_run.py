@@ -21,6 +21,7 @@ C = 299_792_458.0
 SENSOR_ID = "bs1"
 SENSOR_POS_M = np.array([-17.0, 4.0, 19.0])  # scene metres, from the Sionna notebooks
 RX_OFFSET_M = 0.5            # receive antenna sits this far east of transmit (Sionna needs two points)
+POLARIZATION = "V"           # PlanarArray polarization in build_scene, vertical
 CARRIER_HZ = 24e9            # Sionna accepts up to 40 GHz. 24 GHz matches the Doppler study
 BANDWIDTH_HZ = 1024 * 90.909e3
 OBSERVE_S = 6.4e-3           # listening time per frame in the Doppler study
@@ -62,7 +63,7 @@ def build_scene(scene_path):
 
     scene = rt.load_scene(str(scene_path))
     scene.frequency = CARRIER_HZ
-    scene.tx_array = PlanarArray(num_rows=1, num_cols=1, pattern="iso", polarization="V")
+    scene.tx_array = PlanarArray(num_rows=1, num_cols=1, pattern="iso", polarization=POLARIZATION)
     scene.rx_array = scene.tx_array
     scene.add(Transmitter("tx", SENSOR_POS_M.tolist()))
     scene.add(Receiver("rx", (SENSOR_POS_M + [RX_OFFSET_M, 0.0, 0.0]).tolist()))
@@ -176,6 +177,17 @@ def run(scenario, scene_path, waveform="ofdm", seed=1, noise=True):
             "id": SENSOR_ID, "type": "radar", "signal_type": waveform.upper(),
             "carrier_frequency_hz": CARRIER_HZ, "bandwidth_hz": BANDWIDTH_HZ,
             "position_m": SENSOR_POS_M.tolist(),
+            # Same values build_scene gives Sionna: one transmit antenna at the sensor
+            # position and one receive antenna RX_OFFSET_M east of it. Offsets are
+            # measured from the sensor position.
+            "antenna_array": {
+                "layout": "1x1 TX + 1x1 RX",
+                "num_elements": 2,
+                "tx_elements": [0],
+                "rx_elements": [1],
+                "polarization": POLARIZATION,
+                "element_positions_m": [[0.0, 0.0, 0.0], [RX_OFFSET_M, 0.0, 0.0]],
+            },
         },
         "axes": "x=east, y=north, z=up, origin at scene origin (not the antenna)",
         "frames": frames,
