@@ -22,7 +22,8 @@ Every input is one JSON object. Times are ISO 8601 UTC with a timezone, for exam
 | `frames[].time` | text | yes | Frame time |
 | `frames[].detections` | list | no | Readings in that frame |
 | `...detections[].position_m` | `[x, y, z]` metres | yes | East, north, up, from the scene origin |
-| `...detections[].velocity_mps` | `[x, y, z]` m/s | yes | Velocity |
+| `...detections[].velocity_mps` | `[x, y, z]` m/s | no | Velocity. If absent, the tracker estimates it from position changes. A present but malformed value skips the reading |
+| `...detections[].radial_speed_mps` | number, m/s | no | Doppler speed, positive away from the sensor. Written by `sionna_scene_run.py`. The tracker uses it only for a new track's first prediction, and only when `sensor.position_m` is given. A bad value is ignored and logged |
 | `...detections[].power` | number above 0 | yes | Detection power |
 | `sensor` | object | no | See 1.4 |
 
@@ -62,7 +63,7 @@ A field that is missing or invalid is ignored and logged. It never stops the run
 A reading is skipped, logged as `Skipped reading: ...`, and never becomes a track when:
 
 - it is not a JSON object
-- `position_m` or `velocity_mps` is missing, not a list of three numbers, or holds a non-finite value (local)
+- `position_m` is missing, or `position_m` or `velocity_mps` is not a list of three numbers or holds a non-finite value (local)
 - `range_m` is missing, null, not a number, not finite, or negative (radar)
 - `power` is missing, null, not a number, or 0 or below
 
@@ -152,7 +153,7 @@ FastAPI, started from the repo root with `python -m uvicorn dashboard_api.app:ap
 {
   "source": "file",
   "file": "normalized_tracks.json",
-  "origin": { "lat": 37.2284, "lng": -80.4234, "alt_m": 630.0 },
+  "origin": { "lat": 37.228594, "lng": -80.424904, "alt_m": 630.0 },
   "tracks": [ { "track_id": "t1", "points": [ ] } ],
   "skipped_points": 0,
   "fetched_at": "..."

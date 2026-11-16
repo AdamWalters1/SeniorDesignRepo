@@ -37,7 +37,7 @@ class PublishPayloadTests(unittest.TestCase):
 
     def test_north_only_track_gets_a_longitude_span(self) -> None:
         body = build_injection_body(
-            [_point("t1", 0, 37.2284, -80.4234), _point("t1", 1, 37.2291, -80.4234)]
+            [_point("t1", 0, 37.228594, -80.424904), _point("t1", 1, 37.229294, -80.424904)]
         )
         longitudes = [
             sample["position"]["lng"]
@@ -58,7 +58,7 @@ class PublishPayloadTests(unittest.TestCase):
                 return {"access_token": "token-1"}
             return {"injected_flights": body["requested_flights"]}
 
-        points = [_point("t1", 0, 37.2284, -80.4234), _point("t1", 1, 37.2291, -80.4228)]
+        points = [_point("t1", 0, 37.228594, -80.424904), _point("t1", 1, 37.229294, -80.424304)]
         with patch("middleware.publish.mock_uss._request_json", fake_request):
             result = publish_tracks(points, test_id="demo-test", lead_s=120)
 

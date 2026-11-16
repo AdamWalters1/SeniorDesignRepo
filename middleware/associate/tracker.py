@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
-from math import dist
+from math import dist, sqrt
 
 from middleware.models import Detection
 
@@ -26,8 +26,14 @@ class NearestNeighborTracker:
 
     When a detection has no velocity of its own (``velocity_mps is None``), the
     tracker estimates it from how far the track moved since the last update.
-    The first point of a track has no earlier point, so its velocity is zero.
-    Later estimates are smoothed with ``smoothing`` (1.0 means no smoothing).
+    The first point of a track has no earlier point, so its reported velocity is
+    zero. Later estimates are smoothed with ``smoothing`` (1.0 means no smoothing).
+
+    When the first detection of a track carries a Doppler speed and the sensor
+    position is given, the track predicts its second point with that speed along
+    the line of sight, not with zero. Doppler sees only the toward or away part of
+    the motion, so the seed is used for the first prediction only. It is never
+    reported, and the next update replaces it with the change in position.
     """
 
     def __init__(
@@ -86,10 +92,13 @@ class NearestNeighborTracker:
             velocity_known = True
             if velocity is None:
                 velocity, velocity_known = self._estimate_velocity(state, detection)
+            predict_velocity = velocity
+            if detection.velocity_mps is None and not state.seen:
+                predict_velocity = _doppler_seed(detection) or velocity
             detection = replace(detection, velocity_mps=velocity)
             self._tracks[track_id] = _TrackState(
                 detection.position_m,
-                velocity,
+                predict_velocity,
                 detection.time.timestamp(),
                 seen=True,
                 velocity_known=velocity_known,
@@ -115,3 +124,21 @@ class NearestNeighborTracker:
             for axis in range(3)
         )
         return blended, True
+
+
+def _doppler_seed(detection: Detection) -> tuple[float, float, float] | None:
+    """Velocity along the sensor line of sight from a Doppler speed, or None."""
+    meta = detection.source_meta
+    if (
+        detection.radial_speed_mps is None
+        or meta is None
+        or meta.sensor_position_m is None
+        or meta.sensor_position_assumed
+    ):
+        return None
+    offset = [detection.position_m[a] - meta.sensor_position_m[a] for a in range(3)]
+    length = sqrt(sum(c * c for c in offset))
+    if length == 0:
+        return None
+    scale = detection.radial_speed_mps / length
+    return (offset[0] * scale, offset[1] * scale, offset[2] * scale)

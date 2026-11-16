@@ -83,6 +83,8 @@ class Detection:
     sensor_id: str = "unknown"
     uncertainty_m: float | None = None
     source_meta: SourceMeta | None = None
+    radial_speed_mps: float | None = None
+    """Doppler speed along the line from the sensor, positive away from it."""
 
     def __post_init__(self) -> None:
         if len(self.position_m) != 3 or (

@@ -149,12 +149,43 @@ class PointCloudInvalidReadingTests(_TempFileCase):
             self.assertEqual(len(issues), 1, bad)
             self.assertEqual(len(points), 32, bad)
 
-    def test_missing_velocity_is_skipped(self) -> None:
+    def test_absent_velocity_is_estimated_from_positions(self) -> None:
         document = copy.deepcopy(_load(CLOUD_FILE))
         del document["frames"][5]["detections"][0]["velocity_mps"]
-        issues, points = self.run_cloud(document)
-        self.assertEqual(len(issues), 1)
-        self.assertEqual(len(points), 32)
+        issues: list[str] = []
+        path = self.write(document)
+        load_detection_frames(path, issues=issues)
+        points = process_local_detections(path, ORIGIN)
+        self.assertEqual(issues, [])
+        self.assertEqual(len(points), 33)
+
+    def test_malformed_velocity_is_skipped(self) -> None:
+        for bad in (None, [1.0, 2.0], ["a", 1, 2]):
+            document = copy.deepcopy(_load(CLOUD_FILE))
+            document["frames"][5]["detections"][0]["velocity_mps"] = bad
+            issues, points = self.run_cloud(document)
+            self.assertEqual(len(issues), 1, bad)
+            self.assertEqual(len(points), 32, bad)
+
+    def test_radial_speed_is_read_when_present(self) -> None:
+        document = copy.deepcopy(_load(CLOUD_FILE))
+        document["frames"][5]["detections"][0]["radial_speed_mps"] = -3.5
+        path = self.write(document)
+        frames = load_detection_frames(path)
+        self.assertEqual(frames[5].detections[0].radial_speed_mps, -3.5)
+        self.assertIsNone(frames[4].detections[0].radial_speed_mps)
+
+    def test_bad_radial_speed_is_ignored_not_skipped(self) -> None:
+        for bad in (None, "fast", float("nan"), True):
+            document = copy.deepcopy(_load(CLOUD_FILE))
+            document["frames"][5]["detections"][0]["radial_speed_mps"] = bad
+            path = self.write(document)
+            issues: list[str] = []
+            with self.assertLogs("middleware.ingest", level="WARNING"):
+                frames = load_detection_frames(path, issues=issues)
+            self.assertEqual(issues, [], bad)
+            self.assertIsNone(frames[5].detections[0].radial_speed_mps, bad)
+            self.assertEqual(len(frames[5].detections), len(_load(CLOUD_FILE)["frames"][5]["detections"]))
 
     def test_negative_and_null_power_are_skipped(self) -> None:
         for bad in (-0.5, None, 0):

@@ -14,11 +14,11 @@ ROOT = Path(__file__).parents[1]
 
 class GeocodeTests(unittest.TestCase):
     def test_origin_maps_to_itself(self) -> None:
-        origin = GeoPoint(37.2284, -80.4234, 630.0)
+        origin = GeoPoint(37.228594, -80.424904, 630.0)
         self.assertEqual(local_to_wgs84((0, 0, 0), origin), origin)
 
     def test_east_north_up_increase_expected_coordinates(self) -> None:
-        origin = GeoPoint(37.2284, -80.4234, 630.0)
+        origin = GeoPoint(37.228594, -80.424904, 630.0)
         point = local_to_wgs84((10, 10, 10), origin)
         self.assertGreater(point.lat, origin.lat)
         self.assertGreater(point.lng, origin.lng)

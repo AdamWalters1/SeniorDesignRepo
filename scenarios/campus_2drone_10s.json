@@ -1,0 +1,35 @@
+{
+  "scenario": "campus_2drone_10s",
+  "description": "Two small UAS cross paths near t=5 s with 15 m vertical separation. Used to test association through a crossing.",
+  "start_time": "2026-11-16T15:00:00Z",
+  "frame_period_s": 1.0,
+  "num_frames": 11,
+  "drones": [
+    {
+      "id": "a",
+      "start_m": [
+        45,
+        103,
+        55
+      ],
+      "velocity_mps": [
+        -2.5,
+        -7.6,
+        0
+      ]
+    },
+    {
+      "id": "b",
+      "start_m": [
+        3,
+        41,
+        40
+      ],
+      "velocity_mps": [
+        5.0,
+        3.3,
+        0
+      ]
+    }
+  ]
+}
